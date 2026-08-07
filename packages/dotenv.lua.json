@@ -1,0 +1,12 @@
+{
+	"name": "dotenv.lua",
+	"description": "A simple, minimal .env file parser for Lua 5.1+.",
+	"authors": [
+		"Syrup Studios"
+	],
+	"git": "https://github.com/SyrupStudio/dotenv.lua.git",
+	"branch": "main",
+	"versions": {
+		"1.0.0": "1f405a9257d5fa49524b795d70ce2e34c1520d16"
+	}
+}
