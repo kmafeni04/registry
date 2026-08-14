@@ -7,6 +7,7 @@
 	"git": "https://codeberg.org/kmafeni04/targs.git",
 	"branch": "main",
 	"versions": {
-		"0.4.0": "0467aa3fa40ccbf3af55392ea135401e4e4a990e"
+		"0.4.0": "0467aa3fa40ccbf3af55392ea135401e4e4a990e",
+		"0.4.1": "553e3e866a60253c4c204bc707b8198f90cc3d48"
 	}
 }
