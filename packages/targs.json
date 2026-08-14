@@ -1,0 +1,12 @@
+{
+	"name": "targs",
+	"description": "A command line argument parser for lua and teal",
+	"authors": [
+		"Leonard Mafeni <komemafeni944@gmail.com>"
+	],
+	"git": "https://codeberg.org/kmafeni04/targs.git",
+	"branch": "main",
+	"versions": {
+		"0.4.0": "0467aa3fa40ccbf3af55392ea135401e4e4a990e"
+	}
+}
