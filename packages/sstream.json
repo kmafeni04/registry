@@ -1,0 +1,12 @@
+{
+	"name": "sstream",
+	"description": "A library to compose strings",
+	"authors": [
+		"Leonard Mafeni <komemafeni944@gmail.com>"
+	],
+	"git": "https://codeberg.org/kmafeni04/sstream-lua.git",
+	"branch": "main",
+	"versions": {
+		"0.1.2": "383499688dbec7ba1ecc7d341887459ad76ea1f7"
+	}
+}
