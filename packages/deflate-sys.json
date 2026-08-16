@@ -1,0 +1,12 @@
+{
+	"name": "deflate-sys",
+	"description": "Bindings to libdeflate for lde.",
+	"authors": [
+		"David Cruz <david@bycruz.dev>"
+	],
+	"git": "https://github.com/lde-org/deflate-sys.git",
+	"branch": "master",
+	"versions": {
+		"0.1.0": "1b21099dc1b439bb7bf116db44ca4a4ebd2d0ffc"
+	}
+}
