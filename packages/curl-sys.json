@@ -1,0 +1,12 @@
+{
+	"name": "curl-sys",
+	"description": "Bindings to curl for lde.",
+	"authors": [
+		"David Cruz <david@bycruz.dev>"
+	],
+	"git": "https://github.com/lde-org/curl-sys.git",
+	"branch": "master",
+	"versions": {
+		"0.1.0": "9e7056980a20f2acb1a9785d1433897201ceb1fb"
+	}
+}
