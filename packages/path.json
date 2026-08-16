@@ -1,0 +1,12 @@
+{
+	"name": "path",
+	"description": "A cross platform path library for lde.",
+	"authors": [
+		"David Cruz <david@bycruz.dev>"
+	],
+	"git": "https://github.com/lde-org/path.git",
+	"branch": "master",
+	"versions": {
+		"0.1.0": "72c972d5818a2b496666e00103f4d1b582c728fa"
+	}
+}
