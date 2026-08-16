@@ -19,7 +19,15 @@ Pull requests that touch `packages/**` are processed automatically by a bot (see
 - Invalid JSON/schema → the bot requests changes with a list of errors.
 - Non-owners touching an existing package → the PR is closed automatically.
 
-## Example
+### Naming
+
+Packages may be namespaced: a package named `namespace/pkg` is stored at `packages/namespace/pkg.json`, and the portfile's `name` field must equal the path relative to `packages/` minus the `.json` extension.
+
+- A namespace is exactly one level deep: `foo/bar` is valid, `foo/bar/baz` is not.
+- Names may only contain letters, digits, `_` and `-` (no dots, no `..`, no empty segments, no leading/trailing `/`).
+- Flat packages (no `/`) keep working exactly as before.
+
+### Example
 
 ```json
 {
@@ -50,14 +58,21 @@ If your PR is successfully approved, the bot will make note of you as the *owner
 
 It works based off your GitHub id, so there will be no conflicts if your username changes.
 
+Ownership lives in `authority.json`, which has two sections:
+
+- `top`: flat package name → list of owner GitHub ids.
+- `namespaces`: namespace name → list of owner GitHub ids. A namespaced package `ns/pkg` is owned by the owner of its namespace (`ns`), so claiming a namespace claims every package in it.
+
+Owners are stored as arrays (a package may have several), but the bot only ever writes a fresh single-owner array — adding additional owners is done by editing `authority.json` directly (admin only).
+
 Repo admins bypass this check and can obviously modify packages at will.
 
 ### Rules enforced
 
-1. **Schema**: every changed package JSON must validate against `schemas/registry.schema.json`, and the `name` field must match the filename.
-2. **Ownership**: modifying or deleting an existing package requires the recorded owner or a repo admin. New packages are claimable by whoever submits them.
+1. **Schema**: every changed package JSON must validate against `schemas/registry.schema.json`, and the `name` field must match the path relative to `packages/` minus `.json` (see [Naming](#naming)).
+2. **Ownership**: modifying or deleting an existing package requires its owner (for `ns/pkg`, the namespace owner) or a repo admin. New packages are claimable by whoever submits them.
 3. **Versions**: updates may not modify or remove existing versions. Exactly one new version must be added.
-4. **`owners.json`**: only repo admins may edit it directly (it is normally maintained by the bot).
+4. **`authority.json`**: only repo admins may edit it directly (it is normally maintained by the bot).
 5. **New packages are never auto-merged.** The bot approves them and a maintainer merges manually; the owner is recorded on `master` right after the merge.
 
 ### Self Hosting
@@ -71,4 +86,4 @@ The workflows use `GITHUB_TOKEN` for reading, but approving, merging and pushing
 
 Without this secret, validation still runs, but the approve / request-changes / close / merge steps will fail.
 
-Optional: `REGISTRY_BOT_NAME` and `REGISTRY_BOT_EMAIL` secrets override the author of the owners.json commit. By default the bot commits as the account behind `REGISTRY_BOT_TOKEN` (resolved from the token at runtime, using that account's noreply email so GitHub attributes the commit to it), falling back to `robolde` / `robolde@users.noreply.github.com`.
+Optional: `REGISTRY_BOT_NAME` and `REGISTRY_BOT_EMAIL` secrets override the author of the authority.json commit. By default the bot commits as the account behind `REGISTRY_BOT_TOKEN` (resolved from the token at runtime, using that account's noreply email so GitHub attributes the commit to it), falling back to `robolde` / `robolde@users.noreply.github.com`.

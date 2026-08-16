@@ -6,7 +6,7 @@ import { $ } from "bun";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "../..");
 const packagesDir = join(root, "packages");
-const ownersFile = join(root, "owners.json");
+const authorityFile = join(root, "authority.json");
 
 const repo = process.env.REPO ?? "";
 if (!repo) {
@@ -14,16 +14,32 @@ if (!repo) {
 	process.exit(1);
 }
 
-// Load current owners (numeric GitHub ids).
-let owners: Record<string, number> = {};
+// namespaces: namespace name -> owner GitHub ids. top: flat package name ->
+// owner GitHub ids. Namespaced packages are owned via their namespace.
+interface Authority {
+	namespaces: Record<string, number[]>;
+	top: Record<string, number[]>;
+}
+
+// Load current authority (numeric GitHub ids).
+let authority: Authority = { namespaces: {}, top: {} };
 try {
-	owners = JSON.parse(readFileSync(ownersFile, "utf8"));
+	authority = JSON.parse(readFileSync(authorityFile, "utf8"));
 } catch {
-	// no owners file yet
+	// no authority file yet
+}
+
+function isCovered(name: string): boolean {
+	if (name.includes("/")) {
+		const ns = name.split("/")[0] ?? "";
+		return ns in authority.namespaces;
+	}
+	return name in authority.top;
 }
 
 // Every package file without an owner entry is new since the last sync.
-const packageNames = readdirSync(packagesDir)
+const packageNames = readdirSync(packagesDir, { recursive: true })
+	.filter((f): f is string => typeof f === "string")
 	.filter((f) => f.endsWith(".json"))
 	.map((f) => {
 		try {
@@ -35,7 +51,7 @@ const packageNames = readdirSync(packagesDir)
 	})
 	.filter((n): n is string => typeof n === "string");
 
-const missing = packageNames.filter((n) => !(n in owners));
+const missing = packageNames.filter((n) => !isCovered(n));
 if (missing.length === 0) {
 	console.log("No new packages to record.");
 	process.exit(0);
@@ -84,22 +100,32 @@ for (const name of missing) {
 	if (!id || id === "null") {
 		console.error(
 			`Could not resolve the GitHub id of the author of ${relative} (commit ${sha}). ` +
-				`Record it manually in owners.json.`,
+				`Record it manually in authority.json.`,
 		);
 		process.exit(1);
 	}
 
-	owners[name] = Number(id);
-	console.log(`  ${name} -> ${id}`);
+	if (name.includes("/")) {
+		const ns = name.split("/")[0] ?? "";
+		authority.namespaces[ns] = [Number(id)];
+		console.log(`  namespace ${ns} -> ${id}`);
+	} else {
+		authority.top[name] = [Number(id)];
+		console.log(`  ${name} -> ${id}`);
+	}
 }
 
 // Write back sorted, tab-indented like the rest of the repo.
-const sorted: Record<string, number> = {};
-for (const key of Object.keys(owners).sort()) {
-	const value = owners[key];
-	if (value !== undefined) sorted[key] = value;
+const sorted: Authority = { namespaces: {}, top: {} };
+for (const key of Object.keys(authority.namespaces).sort()) {
+	const value = authority.namespaces[key];
+	if (value !== undefined) sorted.namespaces[key] = value;
 }
-writeFileSync(ownersFile, JSON.stringify(sorted, null, "\t") + "\n");
+for (const key of Object.keys(authority.top).sort()) {
+	const value = authority.top[key];
+	if (value !== undefined) sorted.top[key] = value;
+}
+writeFileSync(authorityFile, JSON.stringify(sorted, null, "\t") + "\n");
 
 // The bot's commit identity. Resolves the account behind the token so commits
 // are attributed to it (using the account's noreply email). Can be overridden
@@ -132,7 +158,7 @@ async function resolveIdentity(): Promise<{ name: string; email: string }> {
 }
 
 // Commit and push to master.
-await $`git add owners.json`.cwd(root);
+await $`git add authority.json`.cwd(root);
 const identity = await resolveIdentity();
 const committed = await $`git -c user.name=${identity.name} -c user.email=${identity.email} commit -m "Record owners for new packages"`
 	.nothrow()
@@ -154,4 +180,4 @@ if (pushed.exitCode !== 0) {
 	);
 	process.exit(1);
 }
-console.log("Pushed owners.json to master.");
+console.log("Pushed authority.json to master.");

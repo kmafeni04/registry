@@ -5,7 +5,7 @@ on:
         types: [opened, synchronize, reopened]
         paths:
             - "packages/**"
-            - "owners.json"
+            - "authority.json"
 
 permissions:
     contents: read

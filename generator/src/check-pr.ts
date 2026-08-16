@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { join, dirname, basename } from "node:path";
+import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { $ } from "bun";
 import Ajv from "ajv";
@@ -56,14 +56,31 @@ interface PackageJson {
 	versions?: Record<string, string>;
 }
 
-// ---- Owners (from base ref only, never from the PR) ----
-let owners: Record<string, number> = {};
+// ---- Authority (from base ref only, never from the PR) ----
+// namespaces: namespace name -> owner GitHub ids (all packages in the namespace
+// are owned by its owner). top: flat package name -> owner GitHub ids.
+interface Authority {
+	namespaces: Record<string, number[]>;
+	top: Record<string, number[]>;
+}
+
+let authority: Authority = { namespaces: {}, top: {} };
 try {
-	owners = JSON.parse(
-		readFileSync(join(root, "owners.json"), "utf8"),
+	authority = JSON.parse(
+		readFileSync(join(root, "authority.json"), "utf8"),
 	);
 } catch {
-	// no owners.json on base yet
+	// no authority.json on base yet
+}
+
+// Ownership of a package name: namespaced packages inherit the namespace
+// owner, flat packages are looked up in `top`.
+function ownersFor(name: string): number[] | undefined {
+	if (name.includes("/")) {
+		const ns = name.split("/")[0] ?? "";
+		return authority.namespaces[ns];
+	}
+	return authority.top[name];
 }
 
 async function show(sha: string, path: string): Promise<string | null> {
@@ -75,14 +92,14 @@ type Verdict = "close" | "request-changes" | "approve" | "approve-merge";
 
 const issues: string[] = []; // close-level
 const errors: string[] = []; // request-changes-level (schema)
-let touchedOwnersFile = false;
+let touchedAuthorityFile = false;
 let hasNewPackage = false;
 let hasModifiedPackage = false;
 
 const admin = await isAdmin();
 
 const diffOut = (
-	await $`git diff --name-status ${baseSha}...${headSha} -- packages/ owners.json`
+	await $`git diff --name-status ${baseSha}...${headSha} -- packages/ authority.json`
 		.cwd(root)
 		.text()
 )
@@ -112,11 +129,11 @@ for (const line of diffOut) {
 for (const change of changes) {
 	const { status, path } = change;
 
-	if (path === "owners.json") {
-		touchedOwnersFile = true;
+	if (path === "authority.json") {
+		touchedAuthorityFile = true;
 		if (!admin) {
 			issues.push(
-				"`owners.json` can only be modified by repository admins.",
+				"`authority.json` can only be modified by repository admins.",
 			);
 		}
 		continue;
@@ -136,12 +153,13 @@ for (const change of changes) {
 		} catch {
 			continue;
 		}
-		const owner = pkg.name ? owners[pkg.name] : undefined;
-		if (owner == null) {
-			issues.push(`\`${path}\`: package \`${pkg.name}\` has no recorded owner.`);
-		} else if (owner !== Number(authorId) && !admin) {
+		const name = pkg.name ?? "";
+		const owners = ownersFor(name);
+		if (owners == null || owners.length === 0) {
+			issues.push(`\`${path}\`: package \`${name}\` has no recorded owner.`);
+		} else if (!owners.includes(Number(authorId)) && !admin) {
 			issues.push(
-				`\`${path}\`: only the package owner (GitHub id ${owner}) or a repo admin may delete \`${pkg.name}\`.`,
+				`\`${path}\`: only the package owner (GitHub id ${owners.join(", ")}) or a repo admin may delete \`${name}\`.`,
 			);
 		}
 		continue;
@@ -168,11 +186,24 @@ for (const change of changes) {
 		}
 	}
 
-	// Name must match the filename.
+	// Name must match the filename (packages/<name>.json, nested for namespaces).
 	const name = typeof pkg.name === "string" ? pkg.name : null;
-	if (name && basename(path, ".json") !== name) {
+	if (name && `packages/${name}.json` !== path) {
 		errors.push(
 			`\`${path}\`: package \`name\` (\`${name}\`) must match the filename.`,
+		);
+	}
+	// Defense-in-depth: names are used to build paths; never allow traversal.
+	// The schema pattern covers the format, this guards the path itself.
+	if (
+		name &&
+		(name.includes("..") ||
+			name.startsWith("/") ||
+			name.endsWith("/") ||
+			name.split("/").some((segment) => segment === ""))
+	) {
+		errors.push(
+			`\`${path}\`: package \`name\` (\`${name}\`) is not a valid package name.`,
 		);
 	}
 
@@ -197,14 +228,14 @@ for (const change of changes) {
 		);
 	}
 
-	const owner = baseName ? owners[baseName] : undefined;
-	if (owner == null) {
+	const owners = baseName ? ownersFor(baseName) : undefined;
+	if (owners == null || owners.length === 0) {
 		issues.push(
-			`\`${path}\`: package \`${baseName}\` has no recorded owner; a repo admin needs to add it to owners.json.`,
+			`\`${path}\`: package \`${baseName}\` has no recorded owner; a repo admin needs to add it to authority.json.`,
 		);
-	} else if (owner !== Number(authorId) && !admin) {
+	} else if (!owners.includes(Number(authorId)) && !admin) {
 		issues.push(
-			`\`${path}\`: \`${baseName}\` is owned by GitHub id ${owner}; only the owner or a repo admin may modify it (you are id ${authorId}).`,
+			`\`${path}\`: \`${baseName}\` is owned by GitHub id(s) ${owners.join(", ")}; only the owner or a repo admin may modify it (you are id ${authorId}).`,
 		);
 	}
 
@@ -234,7 +265,7 @@ for (const change of changes) {
 let verdict: Verdict;
 if (issues.length > 0) verdict = "close";
 else if (errors.length > 0) verdict = "request-changes";
-else if (hasNewPackage || touchedOwnersFile) verdict = "approve";
+else if (hasNewPackage || touchedAuthorityFile) verdict = "approve";
 else if (hasModifiedPackage) verdict = "approve-merge";
 else verdict = "approve";
 

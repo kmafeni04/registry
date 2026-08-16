@@ -26,7 +26,9 @@ interface IndexEntry {
 	lastUpdated: string | null;
 }
 
-const files = readdirSync(packagesDir).filter((f) => f.endsWith(".json"));
+const files = readdirSync(packagesDir, { recursive: true })
+	.filter((f): f is string => typeof f === "string")
+	.filter((f) => f.endsWith(".json"));
 
 const index: IndexEntry[] = await Promise.all(
 	files.map(async (f) => {
