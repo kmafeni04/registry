@@ -1,4 +1,4 @@
-name: Generate Index
+name: Record Package Owners
 
 on:
     push:
@@ -11,23 +11,22 @@ permissions:
     contents: write
 
 jobs:
-    generate:
+    record:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
             - uses: oven-sh/setup-bun@v2
 
             - name: Install dependencies
               working-directory: generator
               run: bun install
 
-            - name: Generate index.json
-              run: bun run generate
+            - name: Record owners for new packages
               working-directory: generator
-
-            - name: Deploy to dist branch
-              uses: peaceiris/actions-gh-pages@v4
-              with:
-                  github_token: ${{ secrets.GITHUB_TOKEN }}
-                  publish_branch: dist
-                  publish_dir: generator/dist
+              env:
+                  REPO: ${{ github.repository }}
+                  GH_TOKEN: ${{ secrets.REGISTRY_BOT_TOKEN }}
+              run: bun ./src/record-owners.ts

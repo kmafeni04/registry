@@ -1,0 +1,84 @@
+name: Check PR
+
+on:
+    pull_request_target:
+        types: [opened, synchronize, reopened]
+        paths:
+            - "packages/**"
+            - "owners.json"
+
+permissions:
+    contents: read
+
+concurrency:
+    group: check-pr-${{ github.event.pull_request.number }}
+    cancel-in-progress: true
+
+jobs:
+    check:
+        runs-on: ubuntu-latest
+        steps:
+            # pull_request_target runs in the base repo context (so secrets are
+            # available even for fork PRs). We check out the BASE revision and
+            # only read PR contents via git show — never run PR code.
+            - uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.pull_request.base.sha }}
+                  fetch-depth: 0
+
+            - name: Fetch PR head
+              run: git fetch origin refs/pull/${{ github.event.pull_request.number }}/head
+
+            - uses: oven-sh/setup-bun@v2
+
+            - name: Install dependencies
+              working-directory: generator
+              run: bun install
+
+            - name: Run check
+              id: check
+              working-directory: generator
+              env:
+                  BASE_SHA: ${{ github.event.pull_request.base.sha }}
+                  HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+                  PR_AUTHOR_ID: ${{ github.event.pull_request.user.id }}
+                  PR_AUTHOR_LOGIN: ${{ github.event.pull_request.user.login }}
+                  PR_AUTHOR_ASSOCIATION: ${{ github.event.pull_request.author_association }}
+                  REPO: ${{ github.repository }}
+                  GH_TOKEN: ${{ secrets.REGISTRY_BOT_TOKEN }}
+              run: |
+                  bun ./src/check-pr.ts > "$RUNNER_TEMP/check-result.json"
+                  echo "verdict=$(jq -r .verdict "$RUNNER_TEMP/check-result.json")" >> "$GITHUB_OUTPUT"
+                  jq -r .comment "$RUNNER_TEMP/check-result.json" > "$RUNNER_TEMP/comment.md"
+
+            - name: Close rejected PR
+              if: steps.check.outputs.verdict == 'close'
+              env:
+                  GH_TOKEN: ${{ secrets.REGISTRY_BOT_TOKEN }}
+              run: |
+                  gh pr comment "${{ github.event.pull_request.number }}" --body-file "$RUNNER_TEMP/comment.md"
+                  gh pr close "${{ github.event.pull_request.number }}"
+
+            - name: Request changes
+              if: steps.check.outputs.verdict == 'request-changes'
+              env:
+                  GH_TOKEN: ${{ secrets.REGISTRY_BOT_TOKEN }}
+              run: |
+                  gh pr comment "${{ github.event.pull_request.number }}" --body-file "$RUNNER_TEMP/comment.md"
+                  gh pr review "${{ github.event.pull_request.number }}" --request-changes --body-file "$RUNNER_TEMP/comment.md"
+
+            - name: Approve new package
+              if: steps.check.outputs.verdict == 'approve'
+              env:
+                  GH_TOKEN: ${{ secrets.REGISTRY_BOT_TOKEN }}
+              run: |
+                  gh pr comment "${{ github.event.pull_request.number }}" --body-file "$RUNNER_TEMP/comment.md"
+                  gh pr review "${{ github.event.pull_request.number }}" --approve --body-file "$RUNNER_TEMP/comment.md"
+
+            - name: Approve and merge update
+              if: steps.check.outputs.verdict == 'approve-merge'
+              env:
+                  GH_TOKEN: ${{ secrets.REGISTRY_BOT_TOKEN }}
+              run: |
+                  gh pr review "${{ github.event.pull_request.number }}" --approve --body-file "$RUNNER_TEMP/comment.md"
+                  gh pr merge "${{ github.event.pull_request.number }}" --auto --merge

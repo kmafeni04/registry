@@ -4,10 +4,14 @@
 	"type": "module",
 	"private": true,
 	"scripts": {
-		"generate": "bun ./src/index.ts"
+		"generate": "bun ./src/index.ts",
+		"check-pr": "bun ./src/check-pr.ts",
+		"record-owners": "bun ./src/record-owners.ts"
 	},
 	"devDependencies": {
-		"@types/bun": "latest"
+		"@types/bun": "latest",
+		"ajv": "^8.17.1",
+		"ajv-formats": "^3.0.1"
 	},
 	"peerDependencies": {
 		"typescript": "^5"
