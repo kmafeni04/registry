@@ -1,5 +1,9 @@
 {
-	"namespaces": {},
+	"namespaces": {
+		"std": [
+			86097860
+		]
+	},
 	"top": {
 		"archive": [
 			86097860
