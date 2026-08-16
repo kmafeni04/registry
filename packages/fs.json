@@ -1,0 +1,12 @@
+{
+	"name": "fs",
+	"description": "A cross platform fs library for lde.",
+	"authors": [
+		"David Cruz <david@bycruz.dev>"
+	],
+	"git": "https://github.com/lde-org/fs.git",
+	"branch": "master",
+	"versions": {
+		"0.1.0": "bc8342a49d667b807152ac95191f3818035d1a48"
+	}
+}
