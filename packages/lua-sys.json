@@ -1,0 +1,12 @@
+{
+	"name": "lua-sys",
+	"description": "LuaJIT C api bindings for lde.",
+	"authors": [
+		"David Cruz <david@bycruz.dev>"
+	],
+	"git": "https://github.com/lde-org/lua-sys.git",
+	"branch": "master",
+	"versions": {
+		"0.1.0": "9246e262d0388a744ebe2aa838fdf8a552d67755"
+	}
+}
