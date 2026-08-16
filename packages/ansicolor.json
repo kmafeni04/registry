@@ -1,0 +1,12 @@
+{
+	"name": "ansicolor",
+	"description": "Color text using ansi escape sequences",
+	"authors": [
+		"Leonard Mafeni <komemafeni944@gmail.com>"
+	],
+	"git": "https://codeberg.org/kmafeni04/ansicolor-lua.git",
+	"branch": "main",
+	"versions": {
+		"0.2.0": "0752583fb1301d6adb6596172f051bd78e2611fa"
+	}
+}
