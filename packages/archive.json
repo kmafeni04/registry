@@ -1,0 +1,12 @@
+{
+	"name": "archive",
+	"description": "Archive extraction and creation library. Supports zip and tar.",
+	"authors": [
+		"David Cruz <david@bycruz.dev>"
+	],
+	"git": "https://github.com/lde-org/archive.git",
+	"branch": "master",
+	"versions": {
+		"0.1.0": "fffd1657ec146b136f4416a297faa6af59ebeeaa"
+	}
+}
