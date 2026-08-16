@@ -23,8 +23,13 @@ Pull requests that touch `packages/**` are processed automatically by a bot (see
 
 Packages may be namespaced: a package named `namespace/pkg` is stored at `packages/namespace/pkg.json`, and the portfile's `name` field must equal the path relative to `packages/` minus the `.json` extension.
 
+Names follow these rules (applied to both the namespace and package parts):
+
+- Lowercase only (`a-z`), digits, `_` and `-`. No dots, no `..`, no empty segments, no leading/trailing `/`.
+- Must start with a letter and end with a letter or digit (no purely-special names like `---`; `a-a` is fine).
 - A namespace is exactly one level deep: `foo/bar` is valid, `foo/bar/baz` is not.
-- Names may only contain letters, digits, `_` and `-` (no dots, no `..`, no empty segments, no leading/trailing `/`).
+- The namespace part must be **at least 3 characters** long.
+- The full name (`namespace` + `/` + `package`) must be **at most 128 characters**.
 - Flat packages (no `/`) keep working exactly as before.
 
 ### Example
@@ -67,6 +72,10 @@ Owners are stored as arrays (a package may have several), but the bot only ever 
 
 Repo admins bypass this check and can obviously modify packages at will.
 
+### Requesting a namespace
+
+Namespaces aren't claimed through package PRs — they're requested through an issue. Open an issue containing `/request-namespace <name>` (this is what the lde website generates), and the bot will reply that a moderator must approve it. A repo moderator then comments `!approve` (or `@robolde approve`), and the bot creates the namespace in `authority.json`, assigns ownership to the issue author, and closes the issue. If the namespace already exists, the issue is closed with a notice.
+
 ### Rules enforced
 
 1. **Schema**: every changed package JSON must validate against `schemas/registry.schema.json`, and the `name` field must match the path relative to `packages/` minus `.json` (see [Naming](#naming)).
@@ -81,7 +90,7 @@ The workflows use `GITHUB_TOKEN` for reading, but approving, merging and pushing
 
 1. **Create a dedicated bot account** (e.g. `lde-bot`) and add it as a repository collaborator with **write access**. Using a separate account matters: GitHub does not allow a user to approve their own pull request, so if the token belongs to the same account that opened the PR, the approve step fails. (The workflows tolerate that failure gracefully — the comment still posts and updates still merge — but the review stamp will be missing.)
 2. Create a [fine-grained personal access token](https://github.com/settings/personal-access-tokens/new) for the bot account (recommended), or a classic token with the `repo` scope.
-   - Fine-grained: repository access = this repo, permissions = **Contents: Read and write**, **Pull requests: Read and write**.
+   - Fine-grained: repository access = this repo, permissions = **Contents: Read and write**, **Pull requests: Read and write**, **Issues: Read and write** (the namespace request workflow comments on and closes issues).
 3. Add it as an Actions secret named `REGISTRY_BOT_TOKEN` (Settings → Secrets and variables → Actions).
 
 Without this secret, validation still runs, but the approve / request-changes / close / merge steps will fail.

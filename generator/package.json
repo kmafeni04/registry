@@ -6,7 +6,8 @@
 	"scripts": {
 		"generate": "bun ./src/index.ts",
 		"check-pr": "bun ./src/check-pr.ts",
-		"record-owners": "bun ./src/record-owners.ts"
+		"record-owners": "bun ./src/record-owners.ts",
+		"namespace-request": "bun ./src/namespace-request.ts"
 	},
 	"devDependencies": {
 		"@types/bun": "latest",
