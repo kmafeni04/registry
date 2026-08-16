@@ -65,7 +65,9 @@ jobs:
                   GH_TOKEN: ${{ secrets.REGISTRY_BOT_TOKEN }}
               run: |
                   gh pr comment "${{ github.event.pull_request.number }}" --body-file "$RUNNER_TEMP/comment.md"
-                  gh pr review "${{ github.event.pull_request.number }}" --request-changes --body-file "$RUNNER_TEMP/comment.md"
+                  # GitHub forbids reviewing your own PR; the comment above always
+                  # carries the errors, so a self-review failure is not fatal.
+                  gh pr review "${{ github.event.pull_request.number }}" --request-changes --body "Changes requested automatically - see comment above." || true
 
             - name: Approve new package
               if: steps.check.outputs.verdict == 'approve'
@@ -73,12 +75,13 @@ jobs:
                   GH_TOKEN: ${{ secrets.REGISTRY_BOT_TOKEN }}
               run: |
                   gh pr comment "${{ github.event.pull_request.number }}" --body-file "$RUNNER_TEMP/comment.md"
-                  gh pr review "${{ github.event.pull_request.number }}" --approve --body-file "$RUNNER_TEMP/comment.md"
+                  gh pr review "${{ github.event.pull_request.number }}" --approve --body "Approved automatically - see comment above." || true
 
             - name: Approve and merge update
               if: steps.check.outputs.verdict == 'approve-merge'
               env:
                   GH_TOKEN: ${{ secrets.REGISTRY_BOT_TOKEN }}
               run: |
-                  gh pr review "${{ github.event.pull_request.number }}" --approve --body-file "$RUNNER_TEMP/comment.md"
+                  gh pr comment "${{ github.event.pull_request.number }}" --body-file "$RUNNER_TEMP/comment.md"
+                  gh pr review "${{ github.event.pull_request.number }}" --approve --body "Approved automatically - see comment above." || true
                   gh pr merge "${{ github.event.pull_request.number }}" --auto --merge

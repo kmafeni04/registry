@@ -76,12 +76,14 @@ Every package maps to the **numeric GitHub user id** of its owner — never user
 
 The workflows use `GITHUB_TOKEN` for reading, but approving, merging and pushing need a real user token. You must:
 
-1. Create a [fine-grained personal access token](https://github.com/settings/personal-access-tokens/new) (recommended) for a dedicated bot account, or a classic token with the `repo` scope.
+1. **Create a dedicated bot account** (e.g. `lde-bot`) and add it as a repository collaborator with **write access**. Using a separate account matters: GitHub does not allow a user to approve their own pull request, so if the token belongs to the same account that opened the PR, the approve step fails. (The workflows tolerate that failure gracefully — the comment still posts and updates still merge — but the review stamp will be missing.)
+2. Create a [fine-grained personal access token](https://github.com/settings/personal-access-tokens/new) for the bot account (recommended), or a classic token with the `repo` scope.
    - Fine-grained: repository access = this repo, permissions = **Contents: Read and write**, **Pull requests: Read and write**.
-2. Add it as an Actions secret named `REGISTRY_BOT_TOKEN` (Settings → Secrets and variables → Actions).
-3. The bot account needs **write access** to the repository (or admin, if you want it to bypass branch protection).
+3. Add it as an Actions secret named `REGISTRY_BOT_TOKEN` (Settings → Secrets and variables → Actions).
 
 Without this secret, validation still runs, but the approve / request-changes / close / merge steps will fail.
+
+Optional: `REGISTRY_BOT_NAME` and `REGISTRY_BOT_EMAIL` secrets override the author of the owners.json commit. By default the bot commits as the account behind `REGISTRY_BOT_TOKEN` (resolved from the token at runtime, using that account's noreply email so GitHub attributes the commit to it), falling back to `robolde` / `robolde@users.noreply.github.com`.
 
 ### Self-hosting
 

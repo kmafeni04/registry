@@ -29,4 +29,8 @@ jobs:
               env:
                   REPO: ${{ github.repository }}
                   GH_TOKEN: ${{ secrets.REGISTRY_BOT_TOKEN }}
+                  # Optional: override the commit author (defaults to the account
+                  # behind REGISTRY_BOT_TOKEN, then "robolde").
+                  BOT_NAME: ${{ secrets.REGISTRY_BOT_NAME }}
+                  BOT_EMAIL: ${{ secrets.REGISTRY_BOT_EMAIL }}
               run: bun ./src/record-owners.ts
