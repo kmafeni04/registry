@@ -1,0 +1,12 @@
+{
+	"name": "fstrings",
+	"description": "Adding string interpolation to lua",
+	"authors": [
+		"Leonard Mafeni <komemafeni944@gmail.com>"
+	],
+	"git": "https://codeberg.org/kmafeni04/fstrings-lua.git",
+	"branch": "main",
+	"versions": {
+		"0.1.1": "86cae053f453ab52b38f74342277ddbb4305fd36"
+	}
+}
