@@ -1,0 +1,12 @@
+{
+	"name": "ssdg",
+	"description": "A language agnostic documentation generator written",
+	"authors": [
+		"Leonard Mafeni <komemafeni944@gmail.com>"
+	],
+	"git": "https://codeberg.org/kmafeni04/ssdg.git",
+	"branch": "main",
+	"versions": {
+		"0.2.3": "825e8554564248cf6c40a96e8913ce6775d19435"
+	}
+}
