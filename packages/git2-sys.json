@@ -1,0 +1,12 @@
+{
+	"name": "git2-sys",
+	"description": "Bindings to git2 for lde.",
+	"authors": [
+		"David Cruz <david@bycruz.dev>"
+	],
+	"git": "https://github.com/lde-org/git2-sys.git",
+	"branch": "master",
+	"versions": {
+		"0.1.0": "4102ab000b23d270a43fef36abae599f8283b57d"
+	}
+}
