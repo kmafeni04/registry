@@ -1,0 +1,12 @@
+{
+	"name": "html",
+	"description": "A html DSL written for lua and teal",
+	"authors": [
+		"Leonard Mafeni <komemafeni944@gmail.com>"
+	],
+	"git": "https://codeberg.org/kmafeni04/html-lua.git",
+	"branch": "main",
+	"versions": {
+		"0.1.0": "ded54cef9efd03b40d1012e2c387ef4d380c1cf4"
+	}
+}
