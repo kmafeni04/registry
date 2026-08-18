@@ -7,6 +7,7 @@
 	"git": "https://codeberg.org/kmafeni04/html-lua.git",
 	"branch": "main",
 	"versions": {
-		"0.1.0": "ded54cef9efd03b40d1012e2c387ef4d380c1cf4"
+		"0.1.0": "ded54cef9efd03b40d1012e2c387ef4d380c1cf4",
+		"0.2.0": "986662f6979037ad80f0108f7fc3c8f69473a331"
 	}
 }
