@@ -1,0 +1,13 @@
+{
+	"name": "tilt",
+	"description": "A simple templating engine for lua and teal",
+	"authors": [
+		"Leonard Mafeni <komemafeni944@gmail.com>"
+	],
+	"git": "https://codeberg.org/kmafeni04/tilt.git",
+	"branch": "main",
+	"versions": {
+		"0.1.0": "f53703b11c349b5bce24f5b56c4b5ca3d1a5d0bc",
+    "0.1.1": "51684575ed1b441a3175011348f022b56ee06c5c"
+	}
+}
