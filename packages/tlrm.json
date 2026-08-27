@@ -1,0 +1,12 @@
+{
+	"name": "tlrm",
+	"description": "A Teal/Lua ORM",
+	"authors": [
+		"Leonard Mafeni <komemafeni944@gmail.com>"
+	],
+	"git": "https://codeberg.org/kmafeni04/tlrm.git",
+	"branch": "main",
+	"versions": {
+		"0.1.0": "5514053b9b1b8a52c190e04eca67d0f07f926606"
+	}
+}
