@@ -7,6 +7,7 @@
 	"git": "https://github.com/lde-org/process.git",
 	"branch": "master",
 	"versions": {
-		"0.1.0": "fd521a4e7df864a4f17e79e8485991c0a3eddc77"
+		"0.1.0": "fd521a4e7df864a4f17e79e8485991c0a3eddc77",
+		"0.1.1": "663eaa993131750081f544df4e50a125ea4970ef"
 	}
 }
