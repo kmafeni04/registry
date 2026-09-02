@@ -1,0 +1,12 @@
+{
+	"name": "tltp",
+	"description": "A Teal/LuaJIT HTTP/1.1 web server library",
+	"authors": [
+		"Leonard Mafeni <komemafeni944@gmail.com>"
+	],
+	"git": "https://codeberg.org/kmafeni04/tltp.git",
+	"branch": "main",
+	"versions": {
+		"0.1.0": "af639f410282cea7f6f362fd8e1d24e773127353"
+	}
+}
