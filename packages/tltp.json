@@ -7,6 +7,7 @@
 	"git": "https://codeberg.org/kmafeni04/tltp.git",
 	"branch": "main",
 	"versions": {
-		"0.1.0": "af639f410282cea7f6f362fd8e1d24e773127353"
+		"0.1.0": "af639f410282cea7f6f362fd8e1d24e773127353",
+		"0.2.0": "ba18a31c85628a320ad02efa3462536f034448da"
 	}
 }
