@@ -8,6 +8,7 @@
 	"branch": "master",
 	"versions": {
 		"0.1.0": "390ae5651500cb250a155ae7c682c5cdbec15fb4",
-		"0.1.1": "459c9baf3f02a2b1b762a097ac51cbd0ef420080"
+		"0.1.1": "459c9baf3f02a2b1b762a097ac51cbd0ef420080",
+		"0.3.0": "95b50b3bd7317bd0522cf9f048440ed7334b0978"
 	}
 }
