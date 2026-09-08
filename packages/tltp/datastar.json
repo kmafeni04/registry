@@ -1,0 +1,12 @@
+{
+	"name": "tltp/datastar",
+	"description": "Datastar SSE helpers for tltp",
+	"authors": [
+		"Leonard Mafeni <komemafeni944@gmail.com>"
+	],
+	"git": "https://codeberg.org/kmafeni04/tltp.git",
+	"branch": "main",
+	"versions": {
+		"0.3.0": "06448e412325d037711a71463db2685b68eb328d"
+	}
+}
