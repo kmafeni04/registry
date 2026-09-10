@@ -1,0 +1,12 @@
+{
+	"name": "json",
+	"description": "JSON(5) encoding and decoding for lde, backed by yyjson.",
+	"authors": [
+		"David Cruz <david@bycruz.dev>"
+	],
+	"git": "https://github.com/lde-org/json.git",
+	"branch": "master",
+	"versions": {
+		"0.1.0": "05d08771500ed909a8022b68f98e0c698acf53fc"
+	}
+}
